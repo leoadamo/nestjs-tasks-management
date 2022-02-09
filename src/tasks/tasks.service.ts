@@ -16,6 +16,7 @@ export class TasksService {
   // getAllTasks(): ITask[] {
   //   return this.tasks;
   // }
+
   // getTasksByFilter(getTasksFilterDto: GetTasksFilterDto): ITask[] {
   //   const { status, search }: GetTasksFilterDto = getTasksFilterDto;
   //   let tasks: ITask[] = this.getAllTasks();
@@ -34,7 +35,7 @@ export class TasksService {
   // }
 
   async getTaskById(id: string): Promise<Task> {
-    const found = await this.tasksRepository.getTaskById(id);
+    const found: Task = await this.tasksRepository.getTaskById(id);
 
     if (!found) {
       throw new NotFoundException(
@@ -45,15 +46,26 @@ export class TasksService {
     return found;
   }
 
-  // deleteTask(id: string): void {
-  //   const foundedTask: ITask = this.getTaskById(id);
-  //   this.tasks = this.tasks.filter((task) => task.id !== foundedTask.id);
-  // }
-  // updateTask(id: string, status: TaskStatus): ITask {
-  //   const foundedTask: ITask = this.getTaskById(id);
-  //   foundedTask.status = status;
-  //   return foundedTask;
-  // }
+  async deleteTask(id: string): Promise<void> {
+    const { affected } = await this.tasksRepository.deleteTask(id);
+
+    if (affected === 0) {
+      throw new NotFoundException(
+        `The task with the passed ID '${id}' doesn't exists in the database.`,
+      );
+    }
+  }
+
+  async updateTask(id: string, status: TaskStatus): Promise<Task> {
+    const task: Task = await this.getTaskById(id);
+
+    const updatedTask: Task = await this.tasksRepository.updateTask(
+      task,
+      status,
+    );
+
+    return updatedTask;
+  }
 
   createTask(createTaskDto: CreateTaskDto): Promise<Task> {
     return this.tasksRepository.createTask(createTaskDto);
