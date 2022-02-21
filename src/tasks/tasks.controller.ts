@@ -30,7 +30,6 @@ export class TasksController {
   }
 
   @Post()
-  @HttpCode(201)
   async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
     return this.tasksService.createTask(createTaskDto);
   }
